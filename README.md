@@ -14,6 +14,17 @@
 
 ## 接口说明
 
+### 管理员密码生成方式
+
+> - 本系统只有一个管理员，故写到配置文件里
+>
+> - 执行java类com.ow.utils.EncryptUtil#main
+>
+> - 填写明文密码123456：System.out.println(cipherText("123456"));
+>
+> - 生成的密文填写到application.properties文件login.manage.password=密文
+
+
 ### 管理员登陆接口
 
 > ```apl
