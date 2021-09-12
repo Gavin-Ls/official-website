@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ow.mapper.LeaveMessageMapper">
+
+    <select id="selectByCondition" resultType="com.ow.entity.LeaveMessage">
+        select id, session_id as sessionId, phone, content,state, create_time as createTime, update_time as updateTime
+        from leave_message
+        where 1=1
+        <if test="sessionId != null and sessionId != ''">
+            and session_id = #{sessionId}
+        </if>
+        <if test="phone != null and phone != ''">
+            and phone = #{phone}
+        </if>
+        <if test="state != null">
+            and state = #{state}
+        </if>
+        <if test="createTimeStart != null and createTimeEnd != null">
+            and create_time &gt;= #{createTimeStart}
+            and create_time &lt;= #{createTimeEnd}
+        </if>
+        <if test="updateTimeStart != null and updateTimeEnd != null">
+            and update_time &gt;= #{updateTimeStart}
+            and update_time &lt;= #{updateTimeEnd}
+        </if>
+        <if test="content != null and content != ''">
+            and content like concat('%',#{content},'%')
+        </if>
+        order by id desc
+    </select>
+
+    <insert id="insert" parameterType="com.ow.entity.LeaveMessage" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+        INSERT INTO leave_message (session_id, phone, content, state, create_time, update_time)
+        VALUES (#{sessionId}, #{phone}, #{content}, #{state}, now(), now());
+    </insert>
+
+    <update id="updateBySessionId" parameterType="com.ow.entity.LeaveMessage">
+        UPDATE leave_message
+        SET content     = concat(content, '\n', #{content}),
+            state       = #{state},
+            update_time = now()
+        WHERE session_id = #{sessionId};
+    </update>
+</mapper>

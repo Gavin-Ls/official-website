@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ow.mapper.ChatMessageMapper">
+
+    <select id="selectByCondition" resultType="com.ow.entity.ChatMessage">
+        select id, session_id as sessionId, content, create_time as createTime, update_time as updateTime
+        from chat_message
+        where 1=1
+        <if test="sessionId != null and sessionId != ''">
+            and session_id = #{sessionId}
+        </if>
+        <if test="createTimeStart != null and createTimeEnd != null">
+            and create_time &gt;= #{createTimeStart}
+            and create_time &lt;= #{createTimeEnd}
+        </if>
+        <if test="updateTimeStart != null and updateTimeEnd != null">
+            and update_time &gt;= #{updateTimeStart}
+            and update_time &lt;= #{updateTimeEnd}
+        </if>
+        <if test="content != null and content != ''">
+            and content like concat('%',#{content},'%')
+        </if>
+        order by id desc
+    </select>
+
+    <insert id="insert" parameterType="com.ow.entity.ChatMessage" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
+        INSERT INTO chat_message (session_id, content, create_time, update_time)
+        VALUES (#{sessionId}, #{content}, now(), now());
+    </insert>
+
+    <update id="updateBySessionId" parameterType="com.ow.entity.ChatMessage">
+        UPDATE chat_message
+        SET content     = concat(content, '\n', #{content}),
+            update_time = now()
+        WHERE session_id = #{sessionId};
+    </update>
+</mapper>
